@@ -1,0 +1,19 @@
+{
+  "version": 2,
+  "builds": [
+    {
+      "src": "src/versions/health0.2/index.html",
+      "use": "@vercel/static"
+    }
+  ],
+  "routes": [
+    {
+      "src": "/(.*)",
+      "dest": "/src/versions/health0.2/index.html"
+    }
+  ],
+  "env": {
+    "DEEPSEEK_API_TOKEN": "@deepseek_api_token",
+    "DEEPSEEK_API_URL": "@deepseek_api_url"
+  }
+}
