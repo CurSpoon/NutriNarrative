@@ -236,6 +236,7 @@ const UNITS = {
 ```
 
 # 测试用例
+```JSON
 {
   "records": [
     {
@@ -624,3 +625,4 @@ const UNITS = {
     }
   ]
 }
+```
