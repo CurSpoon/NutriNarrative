@@ -1,7 +1,7 @@
 # NutriNarrative 🥗📊
 
 [![License: MIT](https://img.shields.io/badge/License-MIT-green.svg)](https://opensource.org/licenses/MIT)
-[![PRs Welcome](https://img.shields.io/badge/PRs-welcome-brightgreen.svg)](https://github.com/yourusername/NutriNarrative/pulls)
+[![PRs Welcome](https://img.shields.io/badge/PRs-welcome-brightgreen.svg)](https://github.com/CurSpoon/NutriNarrative/pulls)
 
 智能饮食记录系统，用数据讲述你的美食故事
 
@@ -23,4 +23,4 @@
 ## 快速开始 🚀
 1. 克隆仓库
 ```bash
-git clone https://github.com/yourusername/NutriNarrative.git
+https://github.com/CurSpoon/NutriNarrative.git
