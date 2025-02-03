@@ -1,0 +1,1204 @@
+<!DOCTYPE html>
+<html lang="zh">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>健康饮食记录系统</title>
+    <script src="https://cdn.jsdelivr.net/npm/echarts@5.4.3/dist/echarts.min.js"></script>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Microsoft YaHei', sans-serif;
+            background-color: #f0f2f5;
+            color: #333;
+            line-height: 1.6;
+        }
+
+        .container {
+            max-width: 1200px;
+            margin: 20px auto;
+            padding: 0 20px;
+        }
+
+        /* 输入区域样式优化 */
+        .input-section {
+            background: white;
+            padding: 25px;
+            border-radius: 12px;
+            box-shadow: 0 4px 6px rgba(0,0,0,0.05);
+            margin-bottom: 25px;
+            transition: transform 0.2s ease;
+        }
+
+        .input-section:hover {
+            transform: translateY(-2px);
+        }
+
+        .input-section h2 {
+            color: #1a1a1a;
+            margin-bottom: 20px;
+            font-size: 1.5em;
+            border-left: 4px solid #4CAF50;
+            padding-left: 12px;
+        }
+
+        .input-group {
+            margin-bottom: 20px;
+        }
+
+        .input-group label {
+            display: block;
+            margin-bottom: 8px;
+            font-weight: 600;
+            color: #2c3e50;
+            font-size: 0.95em;
+        }
+
+        .input-group select,
+        .input-group input {
+            width: 100%;
+            padding: 10px 12px;
+            border: 2px solid #e0e0e0;
+            border-radius: 8px;
+            font-size: 0.95em;
+            transition: all 0.3s ease;
+            background-color: #fff;
+        }
+
+        .input-group select:focus,
+        .input-group input:focus {
+            border-color: #4CAF50;
+            outline: none;
+            box-shadow: 0 0 0 3px rgba(76,175,80,0.1);
+        }
+
+        /* 按钮样式优化 */
+        .btn {
+            background-color: #4CAF50;
+            color: white;
+            padding: 12px 24px;
+            border: none;
+            border-radius: 8px;
+            cursor: pointer;
+            font-size: 0.95em;
+            font-weight: 600;
+            transition: all 0.3s ease;
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+        }
+
+        .btn:hover {
+            background-color: #45a049;
+            transform: translateY(-2px);
+            box-shadow: 0 4px 8px rgba(76,175,80,0.2);
+        }
+
+        .btn:active {
+            transform: translateY(0);
+        }
+
+        /* 图表区域样式优化 */
+        .display-section {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+            gap: 25px;
+            margin-bottom: 25px;
+        }
+
+        .chart-container {
+            background: white;
+            padding: 20px;
+            border-radius: 12px;
+            box-shadow: 0 4px 6px rgba(0,0,0,0.05);
+            height: 350px;
+            transition: all 0.3s ease;
+        }
+
+        .chart-container:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 6px 12px rgba(0,0,0,0.1);
+        }
+
+        /* AI 分析报告样式优化 */
+        .analysis-report {
+            background: #ffffff;
+            padding: 30px;
+            border-radius: 12px;
+            margin-top: 20px;
+            box-shadow: 0 4px 6px rgba(0,0,0,0.05);
+        }
+
+        .report-section {
+            margin-bottom: 25px;
+            padding: 20px;
+            border-left: 4px solid #4CAF50;
+            background: #f8f9fa;
+            border-radius: 0 8px 8px 0;
+        }
+
+        .report-section h3 {
+            color: #1a1a1a;
+            margin-bottom: 15px;
+            font-size: 1.2em;
+        }
+
+        .data-item {
+            background: #fff;
+            padding: 15px;
+            border-radius: 8px;
+            margin: 10px 0;
+            display: flex;
+            align-items: center;
+            box-shadow: 0 2px 4px rgba(0,0,0,0.05);
+        }
+
+        .stat-number {
+            font-size: 1.8em;
+            font-weight: 700;
+            color: #4CAF50;
+            margin-right: 15px;
+        }
+
+        .tag {
+            background: #e8f5e9;
+            color: #2e7d32;
+            padding: 8px 16px;
+            border-radius: 20px;
+            font-size: 0.9em;
+            font-weight: 600;
+            margin: 5px;
+            transition: all 0.3s ease;
+        }
+
+        .tag:hover {
+            background: #c8e6c9;
+            transform: translateY(-2px);
+        }
+
+        /* 加载动画优化 */
+        .loading {
+            text-align: center;
+            padding: 30px;
+            font-size: 1.1em;
+            color: #666;
+        }
+
+        .loading::after {
+            content: "...";
+            animation: dots 1.5s steps(5, end) infinite;
+        }
+
+        @keyframes dots {
+            0%, 20% { content: "."; }
+            40% { content: ".."; }
+            60% { content: "..."; }
+            80% { content: "...."; }
+            100% { content: "....."; }
+        }
+
+        /* 热力图样式 */
+        .heatmap-container {
+            background: white;
+            padding: 20px;
+            border-radius: 12px;
+            box-shadow: 0 4px 6px rgba(0,0,0,0.05);
+            margin-bottom: 25px;
+        }
+
+        .heatmap-title {
+            font-size: 1.2em;
+            color: #333;
+            margin-bottom: 15px;
+            padding-bottom: 10px;
+            border-bottom: 1px solid #eee;
+        }
+
+        .meal-heatmap {
+            display: grid;
+            grid-template-columns: 100px 1fr;
+            gap: 15px;
+            margin-top: 15px;
+        }
+
+        .meal-label {
+            display: flex;
+            align-items: center;
+            font-weight: 600;
+            color: #555;
+        }
+
+        .heat-bar {
+            height: 40px;
+            background: #e8f5e9;
+            border-radius: 6px;
+            position: relative;
+            overflow: hidden;
+        }
+
+        .heat-fill {
+            position: absolute;
+            left: 0;
+            top: 0;
+            height: 100%;
+            background: linear-gradient(90deg, #4caf50, #81c784);
+            transition: width 0.5s ease;
+            border-radius: 6px;
+        }
+
+        .calories-value {
+            position: absolute;
+            right: 10px;
+            top: 50%;
+            transform: translateY(-50%);
+            color: #1b5e20;
+            font-weight: 600;
+            text-shadow: 0 0 2px rgba(255,255,255,0.8);
+        }
+
+        /* 热力图动效和提示框样式 */
+        .heat-fill {
+            position: absolute;
+            left: 0;
+            top: 0;
+            height: 100%;
+            background: linear-gradient(90deg, #4caf50, #81c784);
+            transition: all 0.5s ease;
+            border-radius: 6px;
+            cursor: pointer;
+        }
+
+        .heat-fill:hover {
+            filter: brightness(1.1);
+            transform: scaleY(1.05);
+            box-shadow: 0 0 10px rgba(76,175,80,0.3);
+        }
+
+        .meal-tooltip {
+            position: absolute;  /* 改回 absolute 定位 */
+            background: white;
+            border: 1px solid #ddd;
+            border-radius: 8px;
+            padding: 12px;
+            box-shadow: 0 4px 15px rgba(0,0,0,0.15);
+            font-size: 0.9em;
+            z-index: 1000;
+            max-width: 300px;
+            opacity: 0;
+            pointer-events: none;
+            transition: opacity 0.3s ease;
+        }
+
+        .meal-tooltip.visible {
+            opacity: 1;
+        }
+
+        .meal-tooltip-title {
+            font-weight: bold;
+            color: #2e7d32;
+            margin-bottom: 8px;
+            padding-bottom: 5px;
+            border-bottom: 1px solid #e0e0e0;
+        }
+
+        .meal-tooltip-list {
+            margin: 0;
+            padding: 0;
+            list-style: none;
+        }
+
+        .meal-tooltip-list li {
+            padding: 3px 0;
+            color: #555;
+        }
+
+        .meal-tooltip-list li:before {
+            content: "•";
+            color: #4CAF50;
+            margin-right: 5px;
+        }
+
+        .input-hint {
+            font-size: 0.8em;
+            color: #666;
+            margin-top: 4px;
+            font-style: italic;
+        }
+
+        /* 修改卡路里输入框样式 */
+        input[type="number"] {
+            width: 100%;
+            padding: 10px 12px;
+            border: 2px solid #e0e0e0;
+            border-radius: 8px;
+            font-size: 0.95em;
+            transition: all 0.3s ease;
+            background-color: #fff;
+        }
+
+        input[type="number"]:focus {
+            border-color: #4CAF50;
+            outline: none;
+            box-shadow: 0 0 0 3px rgba(76,175,80,0.1);
+        }
+
+        .amount-hints {
+            margin-top: 8px;
+            padding: 8px;
+            background: #f8f9fa;
+            border-radius: 6px;
+            font-size: 0.85em;
+        }
+
+        .hint-title {
+            color: #2c3e50;
+            font-weight: 600;
+            margin-bottom: 6px;
+        }
+
+        .hint-tags {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 6px;
+            margin-bottom: 6px;
+        }
+
+        .hint-tag {
+            background: #e8f5e9;
+            color: #2e7d32;
+            padding: 2px 8px;
+            border-radius: 4px;
+            font-size: 0.9em;
+        }
+
+        .hint-text {
+            color: #666;
+            font-size: 0.9em;
+            line-height: 1.4;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <!-- 数据录入区域 -->
+        <div class="input-section">
+            <h2>记录饮食</h2>
+            <div class="input-group">
+                <label for="date">日期</label>
+                <input type="date" id="date">
+            </div>
+            <div class="input-group">
+                <label for="time">时间</label>
+                <input type="time" id="time" onchange="updateMealType()">
+            </div>
+            <div class="input-group">
+                <label for="mealType">用餐类型</label>
+                <select id="mealType">
+                    <option value="breakfast">早餐</option>
+                    <option value="lunch">午餐</option>
+                    <option value="dinner">晚餐</option>
+                    <option value="snack">加餐</option>
+                </select>
+            </div>
+            <div class="input-group">
+                <label for="food">食物名称</label>
+                <input type="text" id="food" placeholder="请输入食物名称">
+            </div>
+            <div class="input-group">
+                <label for="amount">份量</label>
+                <input type="text" id="amount" placeholder="如：一碗、两片、300g">
+                <div class="amount-hints">
+                    <div class="hint-title">支持的量词：</div>
+                    <div class="hint-tags">
+                        <span class="hint-tag">碗</span>
+                        <span class="hint-tag">份</span>
+                        <span class="hint-tag">片</span>
+                        <span class="hint-tag">个</span>
+                        <span class="hint-tag">盒</span>
+                        <span class="hint-tag">杯</span>
+                        <span class="hint-tag">g/克</span>
+                    </div>
+                    <div class="hint-text">
+                        • 支持中文数字（一、二、两、三...）<br>
+                        • "适量"/"少许" 按 50g 计算<br>
+                        • 无单位默认为克(g)
+                    </div>
+                </div>
+            </div>
+            <div class="input-group">
+                <label for="category">食物类别</label>
+                <select id="category">
+                    <option value="主食">主食(米饭/面包/面条/馒头等)</option>
+                    <option value="肉类">肉类(猪肉/牛肉/羊肉等)</option>
+                    <option value="禽类">禽类(鸡肉/鸭肉/鹅肉等)</option>
+                    <option value="水产">水产(鱼/虾/蟹等)</option>
+                    <option value="蛋类">蛋类(鸡蛋/鸭蛋/皮蛋等)</option>
+                    <option value="豆制品">豆制品(豆腐/豆浆/腐竹等)</option>
+                    <option value="叶菜类">叶菜类(生菜/菠菜/白菜等)</option>
+                    <option value="根茎类">根茎类(胡萝卜/土豆/山药等)</option>
+                    <option value="菌菇类">菌菇类(香菇/平菇/木耳等)</option>
+                    <option value="水果">水果(苹果/香蕉/橙子等)</option>
+                    <option value="坚果">坚果(花生/核桃/杏仁等)</option>
+                    <option value="乳制品">乳制品(牛奶/酸奶/奶酪等)</option>
+                    <option value="零食">零食(饼干/糖果/薯片等)</option>
+                    <option value="饮品">饮品(咖啡/茶/果汁等)</option>
+                    <option value="调味品">调味品(酱油/醋/油等)</option>
+                    <option value="其他">其他</option>
+                </select>
+            </div>
+            <div class="input-group">
+                <label for="calories">卡路里（可选）</label>
+                <input type="number" id="calories" placeholder="请输入卡路里值（可选）" min="0" step="0.1">
+                <div class="input-hint">若不填写，系统将自动计算卡路里值</div>
+            </div>
+            <button class="btn" onclick="addFoodRecord()">添加记录</button>
+        </div>
+
+        <!-- 数据展示区域 -->
+        <div class="display-section">
+            <div class="chart-container" id="caloriesChart"></div>
+            <div class="heatmap-container">
+                <div class="heatmap-title">今日卡路里分布</div>
+                <div id="mealHeatmap"></div>
+            </div>
+        </div>
+
+        <!-- 在 AI分析结果区域 之前添加导入导出按钮 -->
+        <div class="input-section">
+            <h2>数据管理</h2>
+            <div style="display: flex; gap: 10px;">
+                <button class="btn" onclick="exportRecords()">导出数据</button>
+                <input type="file" id="importFile" accept=".json" style="display: none;" onchange="importRecords(event)">
+                <button class="btn" onclick="document.getElementById('importFile').click()">导入数据</button>
+                <button class="btn" style="background-color: #dc3545;" onclick="clearAllRecords()">清除所有数据</button>
+            </div>
+        </div>
+
+        <!-- AI分析结果区域 -->
+        <div class="input-section">
+            <h2>AI 分析报告</h2>
+            <h3>好报告需要酝酿，请给我们3分钟温暖等待❤</h3>
+            <div id="aiAnalysis"></div>
+            <button class="btn" onclick="generateAIAnalysis()">生成分析报告</button>
+        </div>
+    </div>
+
+    <script>
+        // 配置对象
+        const CONFIG = {
+            DEEPSEEK_API_TOKEN: 'API Key',
+            DEEPSEEK_API_URL: 'API 地址',
+            CALORIES_DATABASE: {
+                "主食": {
+                    "米饭": 116,
+                    "面包": 260,
+                    "面条": 110,
+                    "馒头": 223,
+                    "饺子": 200
+                },
+                "肉类": {
+                    "猪肉": 143,
+                    "牛肉": 250,
+                    "羊肉": 203
+                },
+                "禽类": {
+                    "鸡肉": 165,
+                    "鸭肉": 240,
+                    "鹅肉": 238
+                },
+                "水产": {
+                    "鱼": 100,
+                    "虾": 85,
+                    "蟹": 97
+                },
+                "蛋类": {
+                    "鸡蛋": 155,
+                    "鸭蛋": 185,
+                    "皮蛋": 127
+                },
+                "豆制品": {
+                    "豆腐": 76,
+                    "豆浆": 31,
+                    "腐竹": 225
+                },
+                "叶菜类": {
+                    "生菜": 15,
+                    "菠菜": 23,
+                    "白菜": 20
+                },
+                "根茎类": {
+                    "胡萝卜": 41,
+                    "土豆": 76,
+                    "山药": 88
+                },
+                "菌菇类": {
+                    "香菇": 26,
+                    "平菇": 29,
+                    "木耳": 31
+                },
+                "水果": {
+                    "苹果": 52,
+                    "香蕉": 93,
+                    "橙子": 47
+                },
+                "坚果": {
+                    "花生": 589,
+                    "核桃": 654,
+                    "杏仁": 579
+                },
+                "乳制品": {
+                    "牛奶": 60,
+                    "酸奶": 70,
+                    "奶酪": 366
+                },
+                "零食": {
+                    "饼干": 435,
+                    "薯片": 542,
+                    "巧克力": 545
+                },
+                "饮品": {
+                    "咖啡": 1,
+                    "茶": 1,
+                    "果汁": 45
+                }
+            },
+            STANDARD_PORTIONS: {
+                "碗": 250,
+                "份": 200,
+                "片": 30,
+                "个": {
+                    "水果": 150,
+                    "鸡蛋": 50
+                },
+                "盒": 200,
+                "杯": 250
+            }
+        };
+
+        // 数据存储对象
+        let foodRecords = {
+            records: []
+        };
+
+        // 文件句柄
+        let fileHandle;
+
+        // 修改页面加载时的初始化函数
+        window.onload = async function() {
+            try {
+                // 首先尝试从 localStorage 加载数据
+                const savedData = localStorage.getItem('foodRecords');
+                if (savedData) {
+                    foodRecords = JSON.parse(savedData);
+                }
+            } catch (error) {
+                console.error('从localStorage加载数据失败:', error);
+                foodRecords = { records: [] };
+            }
+            
+            initCharts();
+            updateCharts();
+            
+            // 设置当前日期
+            document.getElementById('date').valueAsDate = new Date();
+            
+            // 设置当前时间
+            const now = new Date();
+            const hours = String(now.getHours()).padStart(2, '0');
+            const minutes = String(now.getMinutes()).padStart(2, '0');
+            document.getElementById('time').value = `${hours}:${minutes}`;
+            
+            // 根据当前时间设置用餐类型
+            updateMealType();
+        };
+
+        // 保存记录到文件
+        async function saveFoodRecords() {
+            try {
+                localStorage.setItem('foodRecords', JSON.stringify(foodRecords));
+            } catch (error) {
+                console.error('保存数据失败:', error);
+                alert('保存记录失败，请检查浏览器存储空间');
+            }
+        }
+
+        // 添加食物记录
+        async function addFoodRecord() {
+            const date = document.getElementById('date').value;
+            const time = document.getElementById('time').value;
+            const mealType = document.getElementById('mealType').value;
+            const food = document.getElementById('food').value;
+            const amount = document.getElementById('amount').value;
+            const category = document.getElementById('category').value;
+
+            if (!food || !amount) {
+                alert('请填写完整信息');
+                return;
+            }
+
+            const record = {
+                date,
+                meals: [{
+                    time,
+                    type: mealType,
+                    foods: [{
+                        name: food,
+                        amount,
+                        category,
+                        calories: calculateCalories(food, amount, category),
+                        isManualCalories: !!document.getElementById('calories').value // 添加标记是否为手动输入
+                    }]
+                }]
+            };
+
+            // 查找是否已存在该日期的记录
+            const existingRecordIndex = foodRecords.records.findIndex(r => r.date === date);
+            if (existingRecordIndex >= 0) {
+                foodRecords.records[existingRecordIndex].meals.push(record.meals[0]);
+            } else {
+                foodRecords.records.push(record);
+            }
+
+            // 保存到本地文件
+            await saveFoodRecords();
+
+            // 清空输入
+            document.getElementById('food').value = '';
+            document.getElementById('amount').value = '';
+            document.getElementById('calories').value = '';
+
+            // 更新图表
+            updateCharts();
+        }
+
+        // 计算卡路里
+        function calculateCalories(food, amount, category) {
+            // 首先检查是否有手动输入的卡路里值
+            const manualCalories = document.getElementById('calories').value;
+            if (manualCalories && !isNaN(manualCalories) && manualCalories > 0) {
+                return parseFloat(manualCalories);
+            }
+
+            // 如果没有手动输入，使用原有逻辑计算
+            const standardAmount = standardizeAmount(amount);
+            const categoryName = category.split('(')[0].trim();
+            const caloriesPer100g = CONFIG.CALORIES_DATABASE[categoryName]?.[food] || 100;
+            return (caloriesPer100g * standardAmount) / 100;
+        }
+
+        // 中文数字转换
+        function chineseToNumber(chinese) {
+            const numbers = {
+                '零': 0, '一': 1, '二': 2, '两': 2, '三': 3, '四': 4,
+                '五': 5, '六': 6, '七': 7, '八': 8, '九': 9, '十': 10,
+                '半': 0.5
+            };
+            return numbers[chinese] || chinese;
+        }
+
+        // 标准化份量
+        function standardizeAmount(amount) {
+            // 处理中文数字
+            amount = amount.replace(/[一二两三四五六七八九十半]/g, match => chineseToNumber(match));
+            
+            // 处理模糊描述
+            if (['适量', '少许'].includes(amount)) {
+                return 50; // 按50g计算
+            }
+
+            // 提取数字和单位
+            const match = amount.match(/(\d+\.?\d*)(碗|份|片|个|盒|杯|g|克)?/);
+            if (!match) return 100; // 默认100g
+
+            const [, num, unit] = match;
+            const number = parseFloat(num);
+
+            if (!unit || unit === 'g' || unit === '克') return number;
+
+            // 根据单位转换为克数
+            return number * (CONFIG.STANDARD_PORTIONS[unit] || 100);
+        }
+
+        // 初始化图表
+        function initCharts() {
+            // 仅保留卡路里趋势图
+            const caloriesChart = echarts.init(document.getElementById('caloriesChart'));
+            caloriesChart.setOption({
+                title: { text: '卡路里摄入趋势' },
+                tooltip: {},
+                xAxis: { type: 'category', data: [] },
+                yAxis: { type: 'value' },
+                series: [{
+                    data: [],
+                    type: 'line',
+                    smooth: true
+                }]
+            });
+        }
+
+        // 更新图表
+        function updateCharts() {
+            const caloriesChart = echarts.init(document.getElementById('caloriesChart'));
+
+            // 准备卡路里趋势数据
+            const dates = [];
+            const calories = [];
+
+            foodRecords.records.forEach(record => {
+                dates.push(record.date);
+                let dailyCalories = 0;
+                record.meals.forEach(meal => {
+                    meal.foods.forEach(food => {
+                        dailyCalories += food.calories;
+                    });
+                });
+                calories.push(dailyCalories);
+            });
+
+            // 更新卡路里趋势图
+            caloriesChart.setOption({
+                xAxis: { data: dates },
+                series: [{
+                    data: calories
+                }]
+            });
+
+            // 更新热力图
+            updateHeatmap();
+        }
+
+        // 更新热力图
+        function updateHeatmap() {
+            const heatmapContainer = document.getElementById('mealHeatmap');
+            
+            // 获取最新的记录
+            const latestRecord = [...foodRecords.records]
+                .sort((a, b) => new Date(b.date) - new Date(a.date))[0];
+            
+            // 初始化每餐数据
+            const mealData = {
+                breakfast: { calories: 0, label: '早餐', foods: [] },
+                lunch: { calories: 0, label: '午餐', foods: [] },
+                dinner: { calories: 0, label: '晚餐', foods: [] },
+                snack: { calories: 0, label: '加餐', foods: [] }
+            };
+
+            // 如果有记录，计算每餐卡路里
+            if (latestRecord) {
+                document.querySelector('.heatmap-title').textContent = 
+                    `卡路里分布 (${latestRecord.date})`;
+                    
+                latestRecord.meals.forEach(meal => {
+                    meal.foods.forEach(food => {
+                        mealData[meal.type].calories += food.calories;
+                        mealData[meal.type].foods.push(`${food.name} (${food.amount})`);
+                    });
+                });
+            } else {
+                document.querySelector('.heatmap-title').textContent = 
+                    '卡路里分布 (无记录)';
+            }
+
+            const maxCalories = Math.max(...Object.values(mealData).map(m => m.calories));
+            heatmapContainer.innerHTML = '';
+
+            // 移除旧的提示框
+            const oldTooltip = document.querySelector('.meal-tooltip');
+            if (oldTooltip) {
+                oldTooltip.remove();
+            }
+
+            // 创建新的提示框
+            const tooltip = document.createElement('div');
+            tooltip.className = 'meal-tooltip';
+            heatmapContainer.appendChild(tooltip);  // 将提示框添加到热力图容器中
+
+            // 创建热力图
+            Object.entries(mealData).forEach(([type, data]) => {
+                const percentage = maxCalories ? (data.calories / maxCalories) * 100 : 0;
+                
+                const mealRow = document.createElement('div');
+                mealRow.className = 'meal-heatmap';
+                
+                const heatBar = document.createElement('div');
+                heatBar.className = 'heat-bar';
+                
+                const heatFill = document.createElement('div');
+                heatFill.className = 'heat-fill';
+                heatFill.style.width = `${percentage}%`;
+                
+                // 添加鼠标事件
+                if (data.foods.length > 0) {
+                    heatFill.addEventListener('mouseenter', (e) => {
+                        const rect = e.target.getBoundingClientRect();
+                        tooltip.innerHTML = `
+                            <div class="meal-tooltip-title">${data.label}食物明细</div>
+                            <ul class="meal-tooltip-list">
+                                ${data.foods.map(food => `<li>${food}</li>`).join('')}
+                            </ul>
+                        `;
+
+                        // 简化定位逻辑
+                        let left = rect.right + 10;  // 在热力条右侧显示
+                        let top = rect.top;
+
+                        // 检查是否会超出右边界
+                        const tooltipRect = tooltip.getBoundingClientRect();
+                        if (left + tooltipRect.width > window.innerWidth) {
+                            left = rect.left - tooltipRect.width - 10;  // 改为左侧显示
+                        }
+
+                        tooltip.style.left = `${left}px`;
+                        tooltip.style.top = `${top}px`;
+                        tooltip.classList.add('visible');
+                    });
+
+                    heatFill.addEventListener('mouseleave', () => {
+                        tooltip.classList.remove('visible');
+                    });
+                }
+                
+                const calorieValue = document.createElement('span');
+                calorieValue.className = 'calories-value';
+                calorieValue.textContent = `${Math.round(data.calories)} 卡`;
+                
+                heatBar.appendChild(heatFill);
+                heatBar.appendChild(calorieValue);
+                
+                mealRow.innerHTML = `<div class="meal-label">${data.label}</div>`;
+                mealRow.appendChild(heatBar);
+                
+                heatmapContainer.appendChild(mealRow);
+            });
+        }
+
+        // 修改 formatRecordsForAI 函数
+        function formatRecordsForAI(records) {
+            const prompt = `你是一位专业的饮食分析师，同时也是一位擅长讲故事的美食达人。请运用你的专业知识和故事讲述能力，为用户提供一份生动有趣的饮食分析报告。
+
+分析维度：
+1. 营养均衡分析
+   - 计算每日总卡路里并与推荐值比较
+   - 分析各类食物比例的合理性
+   - 评估营养均衡程度
+   - 识别营养过剩或不足
+
+2. 时间习惯分析
+   - 发现用户最喜欢的用餐时间段
+   - 找出独特的进食时间模式
+   - 分析餐次间隔规律
+   - 评估是否存在深夜进食（22:00后）
+
+3. 美食偏好洞察
+   - 发现最常搭配的食物组合
+   - 识别出用户的口味特征
+   - 分析食物多样性
+   - 创造独特的美食性格标签
+
+4. 特殊模式识别
+   - 连续多天相同食物分析
+   - 不规律餐次识别
+   - 特殊搭配组合评估
+   - 发现独特的饮食习惯
+
+请以下面的HTML格式返回分析结果：
+
+<analysis>
+    <section class="data-summary">
+        <h3>📊 营养数据概要</h3>
+        <div class="data-item">
+            <span class="stat-number">{每日平均卡路里}</span>
+            <span class="stat-label">千卡</span>
+        </div>
+        <div class="data-item">
+            <h4>🥗 食物分类占比</h4>
+            <div class="stat-chart">各类食物比例</div>
+        </div>
+        <div class="data-item">
+            <h4>⚖️ 营养均衡评分</h4>
+            <div class="stat-chart">营养均衡分析</div>
+        </div>
+    </section>
+    
+    <section class="food-personality">
+        <h3>🎭 你的美食性格</h3>
+        <div class="tags">
+            <!-- 每个标签都应该有emoji、名称和解释 -->
+            <div class="tag-group">
+                <div class="tag">{emoji} {性格标签}</div>
+                <div class="tag-explanation">妙趣横生的解释</div>
+            </div>
+        </div>
+    </section>
+    
+    <section class="unique-findings">
+        <h3>🔍 独特发现</h3>
+        <div class="findings-item">
+            <h4>⏰ 时间习惯分析</h4>
+            <p>用户的用餐时间特点</p>
+        </div>
+        <div class="findings-item">
+            <h4>🍳 搭配特色</h4>
+            <p>独特的食物搭配习惯</p>
+        </div>
+        <div class="findings-item">
+            <h4>🌟 特别之处</h4>
+            <p>其他有趣发现</p>
+        </div>
+    </section>
+    
+    <section class="food-story">
+        <h3>📖 你的美食故事</h3>
+        <p>基于数据编织的趣味故事，融入主要发现，突出个性特点</p>
+    </section>
+    
+    <section class="suggestions">
+        <h3>💡 暖心小建议</h3>
+        <div class="suggestion-item">
+            <span class="suggestion-icon">🎯</span>
+            <div class="suggestion-content">
+                <h4>平衡之道</h4>
+                <p>基于营养分析的建议</p>
+            </div>
+        </div>
+        <div class="suggestion-item">
+            <span class="suggestion-icon">🌈</span>
+            <div class="suggestion-content">
+                <h4>生活之趣</h4>
+                <p>基于习惯分析的建议</p>
+            </div>
+        </div>
+    </section>
+</analysis>
+
+要求：
+1. 使用富有创意的比喻和生动的描述
+2. 每个分析点都要基于具体数据
+3. 保持温暖友好的语气，像老朋友聊天
+4. 适当使用表情符号增添趣味
+5. 在保持专业性的同时注入幽默感
+6. 建议要具体可行，避免空泛说教
+
+现在，请分析以下7天的饮食记录：`;
+
+            // 格式化记录数据
+            let recordsText = records.map(record => {
+                const meals = record.meals.map(meal => {
+                    const foods = meal.foods.map(food => 
+                        `${food.name} (${food.amount}, ${food.category})`
+                    ).join('、');
+                    return `${meal.time} ${meal.type}: ${foods}`;
+                }).join('\n');
+                return `${record.date}:\n${meals}`;
+            }).join('\n\n');
+
+            // 添加分析要求
+            const analysisRequest = `
+
+请按以下格式提供分析：
+
+1. 【数据概要】
+   - 每日平均卡路里
+   - 食物分类占比
+   - 主要营养指标
+   - 关键数据特征
+
+2. 【你的美食性格】
+   - 3-4个个性化标签
+   - 每个标签配有简短有趣的解释
+   - 基于实际数据的性格特征
+
+3. 【独特发现】
+   - 2-3个有趣的数据发现
+   - 生动的比喻说明
+   - 突出特别之处
+
+4. 【美食故事】
+   - 200字以内的趣味故事
+   - 融入主要数据发现
+   - 使用生动有趣的表达
+
+5. 【暖心小建议】
+   - 1-2条个性化建议
+   - 基于数据的具体改进点
+   - 保持鼓励性质
+
+请注意：
+- 使用友好亲切的语气
+- 保持趣味性
+- 避免说教
+- 适当使用表情符号
+- 可以适度调侃
+`;
+
+            return prompt + recordsText + analysisRequest;
+        }
+
+        // 调用 Deepseek API
+        async function callDeepseekAPI(content) {
+            const options = {
+                method: 'POST',
+                headers: {
+                    'Authorization': `Bearer ${CONFIG.DEEPSEEK_API_TOKEN}`,
+                    'Content-Type': 'application/json'
+                },
+                body: JSON.stringify({
+                    model: "deepseek-ai/DeepSeek-R1",
+                    messages: [{
+                        role: "user",
+                        content: content
+                    }]
+                })
+            };
+
+            try {
+                const response = await fetch(CONFIG.DEEPSEEK_API_URL, options);
+                if (!response.ok) {
+                    throw new Error(`API 请求失败: ${response.status}`);
+                }
+                const data = await response.json();
+                return data.choices[0].message.content;
+            } catch (error) {
+                console.error('API调用失败:', error);
+                throw new Error(`API 调用失败: ${error.message}`);
+            }
+        }
+
+        // 修改 generateAIAnalysis 函数
+        async function generateAIAnalysis() {
+            const analysisDiv = document.getElementById('aiAnalysis');
+            analysisDiv.innerHTML = '<div class="loading">正在生成分析报告</div>';
+
+            try {
+                // 检查是否有任何记录
+                if (!foodRecords.records || foodRecords.records.length === 0) {
+                    analysisDiv.innerHTML = '<p>没有足够的饮食记录来生成分析报告。请至少记录一天的饮食。</p>';
+                    return;
+                }
+
+                const records = getLastSevenDaysRecords();
+                const content = formatRecordsForAI(records);
+                const analysis = await callDeepseekAPI(content);
+
+                // 直接显示AI返回的内容
+                analysisDiv.innerHTML = `
+                    <div class="analysis-report">
+                        ${analysis}
+                        <div class="report-date">
+                            生成时间：${new Date().toLocaleString()}
+                        </div>
+                    </div>
+                `;
+            } catch (error) {
+                analysisDiv.innerHTML = `<p>生成分析报告时出错：${error.message}</p>`;
+            }
+        }
+
+        // 获取最后七天的记录（或全部记录如果不足七天）
+        function getLastSevenDaysRecords() {
+            // 对记录按日期排序
+            const sortedRecords = [...foodRecords.records].sort((a, b) => 
+                new Date(b.date) - new Date(a.date)
+            );
+            
+            // 取最近的7条记录或全部记录（如果少于7条）
+            return sortedRecords.slice(0, 7);
+        }
+
+        // 导出记录
+        function exportRecords() {
+            try {
+                const data = JSON.stringify(foodRecords, null, 2);
+                const blob = new Blob([data], { type: 'application/json' });
+                const url = URL.createObjectURL(blob);
+                const a = document.createElement('a');
+                const timestamp = new Date().toISOString().split('T')[0];
+                a.href = url;
+                a.download = `foodRecords_${timestamp}.json`;
+                document.body.appendChild(a);
+                a.click();
+                document.body.removeChild(a);
+                URL.revokeObjectURL(url);
+            } catch (error) {
+                console.error('导出失败:', error);
+                alert('导出数据失败');
+            }
+        }
+
+        // 导入记录
+        function importRecords(event) {
+            const file = event.target.files[0];
+            if (!file) return;
+
+            const reader = new FileReader();
+            reader.onload = function(e) {
+                try {
+                    const importedData = JSON.parse(e.target.result);
+                    if (importedData && Array.isArray(importedData.records)) {
+                        if (confirm('是否要合并导入的数据与现有数据？\n点击"确定"合并数据\n点击"取消"替换现有数据')) {
+                            // 合并数据
+                            const existingDates = new Set(foodRecords.records.map(r => r.date));
+                            const newRecords = importedData.records.filter(r => !existingDates.has(r.date));
+                            foodRecords.records = [...foodRecords.records, ...newRecords];
+                        } else {
+                            // 替换数据
+                            foodRecords = importedData;
+                        }
+                        saveFoodRecords();
+                        updateCharts();
+                        alert('数据导入成功！');
+                    } else {
+                        throw new Error('无效的数据格式');
+                    }
+                } catch (error) {
+                    console.error('导入失败:', error);
+                    alert('导入失败：文件格式不正确');
+                }
+            };
+            reader.readAsText(file);
+            // 重置 input 以允许重复导入相同文件
+            event.target.value = '';
+        }
+
+        // 清除所有数据
+        function clearAllRecords() {
+            if (confirm('确定要清除所有数据吗？此操作不可恢复！')) {
+                try {
+                    // 清空数据对象
+                    foodRecords = { records: [] };
+                    // 清除本地存储
+                    localStorage.removeItem('foodRecords');
+                    // 更新图表
+                    updateCharts();
+                    alert('所有数据已清除！');
+                } catch (error) {
+                    console.error('清除数据失败:', error);
+                    alert('清除数据失败，请稍后重试');
+                }
+            }
+        }
+
+        // 根据时间自动选择用餐类型
+        function updateMealType() {
+            const timeInput = document.getElementById('time').value;
+            const [hours] = timeInput.split(':').map(Number);
+            const mealType = document.getElementById('mealType');
+            
+            // 根据时间段选择用餐类型
+            if (hours >= 5 && hours < 10) {
+                mealType.value = 'breakfast';  // 5:00-9:59 早餐
+            } else if (hours >= 10 && hours < 15) {
+                mealType.value = 'lunch';      // 10:00-14:59 午餐
+            } else if (hours >= 15 && hours < 21) {
+                mealType.value = 'dinner';     // 15:00-20:59 晚餐
+            } else {
+                mealType.value = 'snack';      // 其他时间为加餐
+            }
+        }
+    </script>
+</body>
+</html>
