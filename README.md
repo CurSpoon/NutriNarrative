@@ -13,16 +13,19 @@
 
 ## 项目结构 🗂️
 ```
-.
 ├── src
-│   └── versions
-│       ├── health0.1
-│       │   └── index.html
-│       └── health0.2
-│           └── index.html
+│ ├── data
+│ │ └── FoodRecords.json 
+│ └── versions
+│ ├── health0.1
+│ │ └── index.html
+│ ├── health0.2 # 在线AI分析版本
+│ │ └── index.html
+│ └── health0.3 # 本地分析版本
+│ └── index.html
 ├── docs
-│   └── ai-prompts
-│       └── process-records.md
+│ └── ai-prompts
+│ └── process-records.md # AI分析提示词文档
 ├── LICENSE
 └── README.md
 ```
@@ -38,10 +41,16 @@
 - **AI 分析报告优化**:
   - 引入 DeepSeek API 分析接口，为用户生成更个性化的饮食报告。
   - 提供详细的 HTML 格式分析报告，包括营养概要、饮食性格标签等。
+- **界面与交互优化**
+  - 数据录入、分析结果与数据管理布局更加合理。
+  - 按钮、提示框等组件加入动画与视觉效果。
+ 
+ ### 版本 0.2 -> 0.3 更新
 
-**界面与交互优化**
-- 数据录入、分析结果与数据管理布局更加合理。
-- 按钮、提示框等组件加入动画与视觉效果。
+ **功能增减**
+ - **导入方式优化**：通过粘贴板导入导出数据
+ - **完全使用本地分析**：是新建的纯本地的版本
+
 
 ## 技术栈 🛠️
 - **核心框架**: Vanilla JavaScript
